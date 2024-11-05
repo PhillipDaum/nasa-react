@@ -4,6 +4,7 @@ import './App.css'
 function App() {
   const [nasaData, setNasaData] = useState(null);
   const [dates, setDates] = useState(null);
+  const [show, setShow] = useState(false);
 
   // sets the dates for today and 3 days ago
   useEffect(() => {
@@ -16,6 +17,8 @@ function App() {
     setDates([today, threeDaysAgo]);
   }, []);
 
+
+  // I can changes this to go not on dates, but on something else. 
   useEffect(() => {
     if (dates) { // Ensure dates are set before making the API call
       // API call components
@@ -24,7 +27,7 @@ function App() {
       const myKey = "YFd2rMGO2R7KJipZ2lXdYqMP2dsmq3pWKEOz9NXQ";
       // API call URL
       const callURL = `${baseURL}${endPoint}?start_date=${dates[1]}&end_date=${dates[0]}&api_key=${myKey}`;
-      
+
       // Fetching data from NASA
       fetch(callURL)
         .then((response) => response.json())
@@ -37,38 +40,50 @@ function App() {
     }
   }, [dates]);
 
+  const hideHandler = () => {
+    setShow(false);
+  }
+  const showHandler = () => {
+    setShow(true);
+  }
+
   return (
     <>
-      <div className="daily-photos-wrapper">
+      <div>
         <h1>NASA Photo of the Day</h1>
         <p>{dates ? dates.join(' to ') : 'Loading dates...'}</p>
-        {nasaData ? (
-          <div className="daily-photos-grid">
-            {nasaData.map((media, index) => (
-              <div key={index} className="card">
-                <h2>{media.title}</h2>
-                {media.media_type === "image" ? (
-                  <>
-                    <img src={media.url} alt={media.title} />
-                  </>
-                ) : media.media_type === "video" ? (
-                  <>
-                    <iframe 
-                      src={media.url} 
-                      title={media.title} 
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </>
-                ) : (
-                  <p>Media type not supported</p>
-                )}
-                <p>{media.explanation}</p>
-              </div>
-            ))}
+        {show ? (
+          <div className="daily-photos-wrapper">
+            <div className="daily-photos-grid">
+              {nasaData.map((media, index) => (
+                <div key={index} className="card">
+                  <h2>{media.title}</h2>
+                  {media.media_type === "image" ? (
+                    <>
+                      <img src={media.url} alt={media.title} />
+                    </>
+                  ) : media.media_type === "video" ? (
+                    <>
+                      <iframe
+                        src={media.url}
+                        title={media.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                    </>
+                  ) : (
+                    <p>Media type not supported</p>
+                  )}
+                  <p>{media.explanation}</p>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => hideHandler()}>Clear</button>
           </div>
         ) : (
-          <p>Loading photos...</p>
+          <div className="center">
+            <button onClick={() => showHandler()}>See NASA Photos!</button>
+          </div>
         )}
       </div>
     </>
